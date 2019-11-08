@@ -1,0 +1,4 @@
+
+The total number of lines was : 12
+The total number of field was : 50
+The average number of field per line was : 8
