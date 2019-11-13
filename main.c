@@ -194,7 +194,6 @@ void search(struct File_records *data) {
         int field_positions[SIZE];
         int field_counter = 0;
         line++;
-        printf("\n%d", line);
         pos = strstr(str, word);
 
         if (pos != NULL) {
@@ -218,7 +217,6 @@ void search(struct File_records *data) {
                 }
             }
         }
-
     }
     fclose(file);
 }
