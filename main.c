@@ -7,8 +7,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>;
 
 #define SIZE 1000
+
+/* structure holding word frequency information */
+typedef struct word {
+    char	s[SIZE];	/* the word */
+    int	count;		/* number of times word occurs */
+} word;
 
 struct File_records {
     char fname[20];
@@ -23,6 +30,16 @@ void concatenate(struct File_records *data);
 void deletion(struct File_records *data);
 
 void search(struct File_records *data);
+
+int is_alpha(char c);
+
+void remove_non_alpha (char *s);
+
+void make_lowercase (char *s);
+
+void insert_word (word *words, int *n, char *s);
+
+int wordcmp (word *a, word *b);
 
 void export(struct File_records *data);
 
@@ -168,15 +185,14 @@ void deletion(struct File_records *data) {
 }
 
 void search(struct File_records *data) {
-    char word[20];
-
+    char word[SIZE];
 
     // Input word to search in file
     printf("\nEnter a word to search in file :\t");
     scanf("%s", word);
 
     FILE *file;
-    file = fopen(data->fname, "r");
+    file = fopen(data->fname, "r"); //data->fname : "text.txt"
     if (file == NULL) {
         printf("\nUnable to open file.\n");
         exit(-1);
@@ -189,7 +205,9 @@ void search(struct File_records *data) {
     int col = 0;
     char ch;
 
-    while ((fgets(str, SIZE, file) != NULL)) {
+    while (!feof(file)) {
+        fscanf(file,"%s",str);
+        printf("%s",str);
         int char_index = 0;
         int field_positions[SIZE];
         int field_counter = 0;
@@ -197,23 +215,24 @@ void search(struct File_records *data) {
         pos = strstr(str, word);
 
         if (pos != NULL) {
+            /* First index of word in str is
+            * Memory address of pos - memory
+             address of str. */
             col = (pos - str);
 
+            //
             for (ch = getc(file); ch != '\n'; ch = getc(file)) {
                 if (ch == ',') {
                     field_counter++;
                     field_positions[field_counter] = char_index;
                 }
                 char_index++;
-                printf("\n\"%d\"",char_index);
             }
 
             for (int i = 0; i < field_counter; ++i) {
                 if (field_positions[i] < col && field_positions[i + 1] > col) {
                     printf("\nWe found \"%s\" in line %d and in the %d field", word, line, i + 1);
                     break;
-                } else {
-                    printf("\ninner loop");
                 }
             }
         }
@@ -221,13 +240,87 @@ void search(struct File_records *data) {
     fclose(file);
 }
 
+/* return 1 if c is alphabetic (a..z or A..Z), 0 otherwise */
+int is_alpha (char c) {
+    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') return 1;
+    return 0;
+}
+
+/* remove the i'th character from the string s */
+void remove_char (char *s, int i) {
+    while (s[i]) {
+        i++;
+        s[i-1] = s[i];
+    }
+    s[i] = 0;
+}
+
+/* remove non-alphabetic characters from the string s */
+void remove_non_alpha (char *s) {
+    int	i;
+
+    for (i=0; s[i]; i++) if (!is_alpha (s[i])) remove_char(s, i);
+}
+void make_lowercase (char *s) {
+    int	i;
+
+    for (i=0; s[i]; i++) s[i] = tolower(s[i]);
+}
+
+void insert_word (word *words, int *n, char *s) {
+    int	i;
+
+    /* linear search for the word */
+    for (i=0; i<*n; i++) if (strcmp (s, words[i].s) == 0) {
+
+            /* found it?  increment and return. */
+
+            words[i].count++;
+            return;
+        }
+
+    /* error conditions... */
+
+    if (strlen (s) >= SIZE) {
+        fprintf (stderr, "word too long!\n");
+        exit (1);
+    }
+    if (*n >= SIZE) {
+        fprintf (stderr, "too many words!\n");
+        exit (1);
+    }
+
+    /* copy the word into the structure at the first available slot,
+     * i.e., *n
+     */
+
+    strcpy (words[*n].s, s);
+
+    /* this word has occured once up to now, so count = 1 */
+
+    words[*n].count = 1;
+
+    /* one more word */
+
+    (*n)++;
+}
+
+int wordcmp (word *a, word *b) {
+    if (a->count < b->count) return +1;
+    if (a->count > b->count) return -1;
+    return 0;
+}
+
 void export(struct File_records *data) {
 
     char ch;
-    int fields_per_line[SIZE];
+    float fields_per_line[SIZE];
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
+    word words[SIZE];
+    char s[1000];
+    int i, n, m;
 
     FILE *file;
     file = fopen(data->fname, "r");
@@ -248,28 +341,62 @@ void export(struct File_records *data) {
     float average;
     for (int i = 0; i < line_counter; ++i) {
         sum += fields_per_line[i];  // find the average field per line;
-        average = sum / line_counter;
+        average = (float) sum / line_counter;
     }
 
     fclose(file);
 
     printf("\nThe total number of lines was : %d", line_counter);
     printf("\nThe total number of field was : %d", field_counter);
-    printf("\nThe average number of field per line was : %1.2f\n", average);
+    printf("\nThe average number of field per line was : %.2f\n", average);
 
-    //Under Construction
-    printf("\nUnder Construction\n");
-    char buffer[SIZE];
-    char *string[SIZE];
-    char *last_token;
+    n = 0;
 
-    //Opens file in read mode
     file = fopen(data->fname, "r");
-    if (file == NULL) {
-        printf("Error opening file");
-        exit(0);
-    }
 
+    /* read all the words from the file... */
+    while (!feof(file)) {
+        fscanf(file, "%s", s);
+
+        /* only insert the word if it's not punctuation */
+
+        if (is_alpha(s[0])) {
+
+            /* get rid of non-letters */
+
+            remove_non_alpha(s);
+
+            /* make all letters lowercase */
+
+            make_lowercase(s);
+
+            /* put this word in the list */
+
+            insert_word(words, &n, s);
+
+        }
+    }
+    /* sort the list of words by descending frequency */
+
+    qsort((void *) words, n, sizeof(word),
+          (int (*)(const void *, const void *)) wordcmp);
+
+
+    /* if fewer than 20 words in total, just print up the the
+     * first n words
+     */
+    if (n < 20)
+        m = n;
+    else
+        m = 20;
+
+    /* print the words with their frequencies */
+    printf("\nThe 5 most common words in the file are:\n");
+    for (i = 0; i < 5; i++){
+        if (words[i].count != 0) {
+            printf("\n%s: %d\n", words[i].s, words[i].count);
+        }
+    }
     fclose(file);
 }
 
