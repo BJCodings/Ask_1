@@ -7,66 +7,74 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#define SIZE 100000
+
+#define SIZE 1000
+
+struct File_records {
+    char fname[20];
+    int choice;
+};
 
 //Declaration of the procedures
-void creation(char *ptr_fname);
-void concatenate(char *ptr_fname);
-void deletion(char *ptr_fname);
-void search(char *ptr_fname);
-void export(char *ptr_fname);
-void export_file(char *ptr_fname);
+void creation(struct File_records *data);
+
+void concatenate(struct File_records *data);
+
+void deletion(struct File_records *data);
+
+void search(struct File_records *data);
+
+void export(struct File_records *data);
+
+void export_file(struct File_records *data);
 
 int main() {
+    struct File_records *data;
+    data->choice = -1;
 
-    int choice =-1;
-    char fname[20];
-    char *ptr_fname = fname; // pointer for the name of the file
-    printf("asdf");
-
-    while(choice != 0){
+    while (data->choice != 0) {
 
         printf("\n********************************************************************************************");
-        printf("\n1. Give a name for a file"
-                        "\n2. Add a new record"
-                        "\n3. Delete a record"
-                        "\n4. Search a record"
-                        "\n5. Export the statistics in the screen"
-                        "\n6. Export the statistics in a txt file"
-                        "\n0. Exit the program");
+        printf("\n1. Give a name for a data"
+               "\n2. Add a new record"
+               "\n3. Delete a record"
+               "\n4. Search a record"
+               "\n5. Export the statistics in the screen"
+               "\n6. Export the statistics in a txt data"
+               "\n0. Exit the program");
         printf("\n********************************************************************************************");
         printf("\nSelect an option:\t");
-        scanf("%d",&choice);
+        scanf("%d", &data->choice);
         fflush(stdin);
 
-        if(choice == 1){
-            creation(ptr_fname);
-        }else if(choice == 2){
-            concatenate(ptr_fname);
-        }else if(choice == 3){
-            deletion(ptr_fname);
-        }else if(choice == 4){
-            search(ptr_fname);
-        }else if(choice == 5){
-            export(ptr_fname);
-        }else if(choice == 6){
-            export_file(ptr_fname);
-        }else if(choice == 0){
+        if (data->choice == 1) {
+            creation(data);
+        } else if (data->choice == 2) {
+            concatenate(data);
+        } else if (data->choice == 3) {
+            deletion(data);
+        } else if (data->choice == 4) {
+            search(data);
+        } else if (data->choice == 5) {
+            export(data);
+        } else if (data->choice == 6) {
+            export_file(data);
+        } else if (data->choice == 0) {
             printf("\nTerminating program...");
             exit(0);
         }
     }
 }
+
 // Procedure for the creation of a txt file
-void creation(char *ptr_fname){
+void creation(struct File_records *data) {
 
     printf("Enter a name for the file :\t");
-    gets(ptr_fname);
+    gets(data->fname);
 
     FILE *file;
-    file = fopen(ptr_fname,"a+");
-    if (file == NULL)
-    {
+    file = fopen(data->fname, "a+");
+    if (file == NULL) {
         printf("\n\tError opening file!\n");
         exit(-1);
     }
@@ -80,13 +88,12 @@ void creation(char *ptr_fname){
 }
 
 // Procedure for adding more data to the file
-void concatenate(char *ptr_fname){
+void concatenate(struct File_records *data) {
 
     FILE *file;
-    file = fopen(ptr_fname,"a+");
-    if (file == NULL)
-    {
-        printf("Error opening file!\n");
+    file = fopen(data->fname, "a+");
+    if (file == NULL) {
+        printf("\nError opening data!\n");
         exit(-1);
     }
 
@@ -99,125 +106,124 @@ void concatenate(char *ptr_fname){
 }
 
 //Procedure that delete a specific line-entry from the file
-void deletion(char *ptr_fname){
+void deletion(struct File_records *data) {
 
     FILE *original_file, *temp_file;
     char ch;
-    int delete_line, line = 1;
+    char str[SIZE];
+    int delete_line, line = 0;
 
     //open file in read mode
-    original_file = fopen(ptr_fname, "r");
-    ch = getc(original_file);
-
-    //Prints the entries of the file
-    while (ch != EOF)
-    {
-        printf("%c", ch);
-        ch = getc(original_file);
+    original_file = fopen(data->fname, "r");
+    if (!original_file) {
+        printf("\nError opening data!\n");
+        exit(-1);
     }
 
+    //Prints the entries of the file
+    printf("**************************************************\n");
+    while (ch != EOF) {
+        ch = getc(original_file);
+        printf("%c", ch);
+    }
+    printf("**************************************************\n");
+
     rewind(original_file); //rewind the file pointer;
-    printf("\nEnter the line number of the line to be deleted:\t");
+    printf("Enter the line number of the line to be deleted:\t");
     scanf("%d", &delete_line); // Get the line that going to be deleted
 
     //open new file in write mode
     temp_file = fopen("replica.c", "w");
-    ch = ' ';  //resetting ch
-    while (ch != EOF)
-    {
-        ch = getc(original_file);
+    if (!temp_file) {
+        printf("\nError opening data!\n");
+        exit(-1);
+    }
+
+    ch = 'A';  //resetting ch
+    while (!feof(original_file)) {
+        strcpy(str, original_file);
+        fgets(str, SIZE, original_file);
         //except the line to be deleted
-        if (line != delete_line)
-        {
-            //copy all lines in file replica.c
-            putc(ch, temp_file);
-        }
-        if (ch == '\n')
-        {
-            line++; //increment line
+        if (!feof(original_file)) {
+            line++;
+            /* skip the line at given line number */
+            if (line != delete_line) {
+                fprintf(temp_file, "%s", str);
+            }
         }
     }
     fclose(original_file);
     fclose(temp_file);
-    remove(ptr_fname); //delete the original file
-
-    //rename the file replica.c to original file name
-    rename("replica.c", ptr_fname);
+    remove(data->fname); //delete the original file
+    rename("replica.c", data->fname); //rename the file replica.c to original file name
 
     printf("\nThe contents of file after being modified are as follows:\n\t");
-    original_file = fopen(ptr_fname, "r");
+    original_file = fopen(data->fname, "r");
     ch = getc(original_file);
-    while (ch != EOF)
-    {
+    while (ch != EOF) {
         printf("%c", ch);
         ch = getc(original_file);
     }
     fclose(original_file);
 }
 
-void search(char *ptr_fname){
-    char word[SIZE];
-    char ch;
-    char str [SIZE]; //
-    int line;
-    char *pos;
-    line = -1;
-    int field_counter = 0; // counts the field(commas)
-    int field_position[1000]; // hold the pos of every field
-    int index = 0;
-    int field;
-    bool flag = false;
+void search(struct File_records *data) {
+    char word[20];
+
 
     // Input word to search in file
-    printf("Enter a word to search in file: ");
+    printf("\nEnter a word to search in file :\t");
     scanf("%s", word);
 
     FILE *file;
-    file = fopen(ptr_fname,"r");
-    if (file == NULL)
-    {
-        printf("Unable to open file.\n");
+    file = fopen(data->fname, "r");
+    if (file == NULL) {
+        printf("\nUnable to open file.\n");
         exit(-1);
     }
 
-    //Fixed
-    while ((fgets(str, SIZE, file)) != NULL){
+    //Fixing
+    char str[SIZE];
+    char *pos;
+    int line = 0;
+    int col = 0;
+    char ch;
 
-        line += 1; // counts the lines
+    while ((fgets(str, SIZE, file) != NULL)) {
+        int char_index = 0;
+        int field_positions[SIZE];
+        int field_counter = 0;
+        line++;
+        printf("\n%d", line);
+        pos = strstr(str, word);
 
-        pos = strstr(str, word); // returns the pos of the founded word
+        if (pos != NULL) {
+            col = (pos - str);
 
-        if (pos != NULL){
             for (ch = getc(file); ch != '\n'; ch = getc(file)) {
-
                 if (ch == ',') {
-                    field_counter++; // count how many field there are
-                    field_position[field_counter] = index; // saves the pos of each found field
-                    flag = true;
+                    field_counter++;
+                    field_positions[field_counter] = char_index;
                 }
-                index++;
+                char_index++;
+                printf("\n\"%d\"",char_index);
             }
 
-            field = 1;
-            for (int i = 0; i < sizeof(field_position) ; ++i) { // finds the field
-                if(field_position[i] <= field && field_position[i + 1] >= field ){
+            for (int i = 0; i < field_counter; ++i) {
+                if (field_positions[i] < col && field_positions[i + 1] > col) {
+                    printf("\nWe found \"%s\" in line %d and in the %d field", word, line, i + 1);
                     break;
-                }else{
-                    field++;
+                } else {
+                    printf("\ninner loop");
                 }
-            }
-            if (flag){
-                printf("\t\nThe word \"%s\" was found at line %d and in the %d field",word, line, field);
             }
         }
-    }
-    if(flag == false){
-        printf("\nWe couldn't find the word that you looking for");
+
     }
     fclose(file);
 }
 
-void export(char *ptr_fname) {
+void export(struct File_records *data) {
 
     char ch;
     int fields_per_line[SIZE];
@@ -226,7 +232,7 @@ void export(char *ptr_fname) {
     float sum = 0;
 
     FILE *file;
-    file = fopen(ptr_fname, "r");
+    file = fopen(data->fname, "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -241,49 +247,35 @@ void export(char *ptr_fname) {
             fields_per_line[line_counter] += 1; // and store them
         }
     }
-
+    float average;
     for (int i = 0; i < line_counter; ++i) {
         sum += fields_per_line[i];  // find the average field per line;
+        average = sum / line_counter;
     }
 
     fclose(file);
 
     printf("\nThe total number of lines was : %d", line_counter);
     printf("\nThe total number of field was : %d", field_counter);
-    printf("\nThe average number of field per line was : %.2f\n", (float) sum / line_counter);
+    printf("\nThe average number of field per line was : %1.2f\n", average);
 
     //Under Construction
-    printf("\nUnder Construction");
+    printf("\nUnder Construction\n");
     char buffer[SIZE];
     char *string[SIZE];
     char *last_token;
 
     //Opens file in read mode
-    file = fopen(ptr_fname, "r");
+    file = fopen(data->fname, "r");
     if (file == NULL) {
-        printf("File not found");
-        exit(EXIT_FAILURE);
+        printf("Error opening file");
+        exit(0);
     }
 
-    //Since, C doesn't provide in-built function,
-    //following code will split content of file into words
-    int i = 0;
-    while (fgets(buffer,SIZE,file) !=NULL){
-        last_token = strtok( buffer, " " );
-        while( last_token != NULL ){
-            string [i] = last_token;
-            last_token = strtok( NULL, " " );
-            i++;
-        }
-    }
-
-    for (int j = 0; j < i ; ++j) {
-        printf("%s",string[j]);
-    }
-
+    fclose(file);
 }
 
-void export_file(char *ptr_fname) {
+void export_file(struct File_records *data) {
     char ch;
     char exported_file_name[SIZE];
     int fields_per_line[SIZE];
@@ -291,12 +283,12 @@ void export_file(char *ptr_fname) {
     int field_counter = 0;
     float sum = 0;
 
-    printf("\nEnter the name of the the file of which the contends of the file \"%s\" will be exported to :\t",
-           ptr_fname);
+    printf("\nEnter the name of the the file of which the contents of the file \"%s\" will be exported to :\t",
+           data->fname);
     gets(exported_file_name);
 
     FILE *file;
-    file = fopen(ptr_fname, "r");
+    file = fopen(data->fname, "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -311,22 +303,24 @@ void export_file(char *ptr_fname) {
             fields_per_line[line_counter] += 1;
         }
     }
-
+    float average;
     for (int i = 0; i < line_counter; ++i) {
         sum += fields_per_line[i];
+        average = sum / line_counter;
     }
 
     FILE *export_file;  //Creation of a new file
-    export_file = fopen(exported_file_name, "w+");
+    export_file = fopen(exported_file_name, "w");
     if (export_file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
     }
-    printf("\nThe file has successfully exported with the name : \"%s\"", exported_file_name);
 
     fprintf(export_file, "\nThe total number of lines was : %d", line_counter);
     fprintf(export_file, "\nThe total number of field was : %d", field_counter);
-    fprintf(export_file, "\nThe average number of field per line was : %.f", (float) sum / line_counter);
+    fprintf(export_file, "\nThe average number of field per line was : %1.2f", average);
+
+    printf("\nThe file has successfully exported with the name : \"%s\"", exported_file_name);
 
     fclose(file);
     fclose(export_file);
