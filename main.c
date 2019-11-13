@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <ctype.h>;
 
 #define SIZE 1000
@@ -271,23 +270,14 @@ void insert_word (word *words, int *n, char *s) {
     int	i;
 
     /* linear search for the word */
-    for (i=0; i<*n; i++) if (strcmp (s, words[i].s) == 0) {
+    for (i=0; i<*n; i++) {
+        if (strcmp(s, words[i].s) == 0) {
 
             /* found it?  increment and return. */
 
             words[i].count++;
             return;
         }
-
-    /* error conditions... */
-
-    if (strlen (s) >= SIZE) {
-        fprintf (stderr, "word too long!\n");
-        exit (1);
-    }
-    if (*n >= SIZE) {
-        fprintf (stderr, "too many words!\n");
-        exit (1);
     }
 
     /* copy the word into the structure at the first available slot,
@@ -318,9 +308,7 @@ void export(struct File_records *data) {
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
-    word words[SIZE];
-    char s[1000];
-    int i, n, m;
+
 
     FILE *file;
     file = fopen(data->fname, "r");
@@ -350,7 +338,11 @@ void export(struct File_records *data) {
     printf("\nThe total number of field was : %d", field_counter);
     printf("\nThe average number of field per line was : %.2f\n", average);
 
-    n = 0;
+
+    //tesxt
+    word words[SIZE];
+    char s[1000];
+    int i, n, m;
 
     file = fopen(data->fname, "r");
 
@@ -380,15 +372,6 @@ void export(struct File_records *data) {
 
     qsort((void *) words, n, sizeof(word),
           (int (*)(const void *, const void *)) wordcmp);
-
-
-    /* if fewer than 20 words in total, just print up the the
-     * first n words
-     */
-    if (n < 20)
-        m = n;
-    else
-        m = 20;
 
     /* print the words with their frequencies */
     printf("\nThe 5 most common words in the file are:\n");
