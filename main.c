@@ -89,7 +89,8 @@ int main() {
 void creation(struct File_records *data) {
 
     printf("Enter a name for the file :\t");
-    gets(data->fname);
+    scanf("%s",data->fname);
+    fflush(stdin);
 
     FILE *file;
     file = fopen(data->fname, "a+");
@@ -187,7 +188,6 @@ void deletion(struct File_records *data) {
 
 void search(struct File_records *data) {
     char word[MIN_SIZE];
-
     // Input word to search in file
     printf("\nEnter a word to search in file :\t");
     scanf("%s", word);
@@ -278,10 +278,11 @@ int wordcmp (word *a, word *b) {
 void export(struct File_records *data) {
 
     char ch;
-    float fields_per_line[MAX_SIZE];
+    float fields_per_line[MIN_SIZE];
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
+
 
 
     FILE *file;
@@ -355,6 +356,7 @@ void export(struct File_records *data) {
 }
 
 void export_file(struct File_records *data) {
+
     char ch;
     char exported_file_name[MAX_SIZE];
     int fields_per_line[MAX_SIZE];
@@ -364,7 +366,7 @@ void export_file(struct File_records *data) {
 
     printf("\nEnter the name of the the file of which the contents of the file \"%s\" will be exported to :\t",
            data->fname);
-    gets(exported_file_name);
+    scanf("%s",data->fname);
 
     FILE *file;
     file = fopen(data->fname, "r");
