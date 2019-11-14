@@ -318,6 +318,7 @@ void export(struct File_records *data) {
     printf("\nThe average number of field per line was : %.2f\n", average);
 
     fclose(file);
+
     // Five more frequent words
     word words[MAX_SIZE];
     char s[MAX_SIZE];
@@ -364,7 +365,7 @@ void export(struct File_records *data) {
             printf("\n%s: %d\n", words[i].s, words[i].count);
         }
     }
-
+    fclose(file);
 }
 
 void export_file(struct File_records *data) {
