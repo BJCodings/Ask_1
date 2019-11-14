@@ -1,9 +1,4 @@
 "C:\Program Files\JetBrains\CLion 2019.2\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" C:\Users\jsdes\CLionProjects\Ask_1
-CMake Error at CMakeLists.txt:7 (add_executable):
-  The target name "Ask_1.c{SOURCE_FILES}" is reserved or not valid for
-  certain CMake features, such as generator expressions, and may result in
-  undefined behavior.
-
-
--- Configuring incomplete, errors occurred!
-See also "C:/Users/jsdes/CLionProjects/Ask_1/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/jsdes/CLionProjects/Ask_1/cmake-build-debug

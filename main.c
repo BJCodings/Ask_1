@@ -187,21 +187,19 @@ void deletion(struct File_records *data) {
 }
 
 void search(struct File_records *data) {
-//    char word[MIN_SIZE];
-//    char str[MAX_SIZE];
-//    // Input word to search in file
-//    printf("\nEnter a word to search in file :\t");
-//    scanf("%s", word);
-//
-//    FILE *file;
-//    file = fopen(data->fname, "r"); //data->fname : "text.txt"
-//    if (file == NULL) {
-//        printf("\nUnable to open file.\n");
-//        exit(-1);
-//    }
-//    while((fgets(str,MAX_SIZE,file))!=NULL{
-//
-//    })
+    char word[MIN_SIZE];
+    char str[MAX_SIZE];
+    // Input word to search in file
+    printf("\nEnter a word to search in file :\t");
+    scanf("%s", word);
+
+    FILE *file;
+    file = fopen(data->fname, "r"); //data->fname : "text.txt"
+    if (file == NULL) {
+        printf("\nUnable to open file.\n");
+        exit(-1);
+    }
+
 }
 
 /*
@@ -310,7 +308,7 @@ void export(struct File_records *data) {
         }
     }
     float average;
-    for (int i = 0; i < line_counter; ++i) {
+    for (int i = 0; i < line_counter; i++) {
         sum += fields_per_line[i];  // find the average field per line;
         average = (float) sum / line_counter;
     }
