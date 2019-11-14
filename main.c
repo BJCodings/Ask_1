@@ -1,5 +1,5 @@
 /*
- *              Basilis Georgilas A.M:2118147
+ *              Vasilis Georgoulas A.M:2118147
  * Authors :  &
  *              Ioannis Skoumpas A.M: 2118063
  */
