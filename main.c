@@ -273,14 +273,20 @@ void remove_char (char *s, int i) {
 void remove_non_alpha (char *s) {
     int	i;
 
-    for (i=0; s[i]; i++) if (!is_alpha (s[i])) remove_char(s, i);
+    for (i=0; s[i]; i++){
+		 if (!is_alpha (s[i])){
+			  remove_char(s, i);
+		  }
+	  }
 }
 
 /* make all the letters in s lowercase */
 void make_lowercase (char *s) {
     int	i;
 
-    for (i=0; s[i]; i++) s[i] = tolower(s[i]);
+    for (i=0; s[i]; i++){
+		 s[i] = tolower(s[i]);
+	 }
 }
 
 
