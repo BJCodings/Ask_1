@@ -8,7 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_SIZE 10000
+#define MAX_SIZE 1000
 #define MIN_SIZE 100
 
 /* structure holding word frequency information */
@@ -64,7 +64,7 @@ int main() {
         printf("\n********************************************************************************************");
         printf("\nSelect an option:\t");
         scanf("%d",&data->choice);
-        fflush(stdin);
+        getc(stdin);
 
         if (data->choice == 1) {
             creation(data);
@@ -90,7 +90,7 @@ void creation(struct File_records *data) {
 
     printf("Enter a name for the file :\t");
     scanf("%s",data->fname);
-    fflush(stdin);
+    getc(stdin);
 
     FILE *file;
     file = fopen(data->fname, "a+");
@@ -203,6 +203,58 @@ void search(struct File_records *data) {
 
 }
 
+/*
+ * This function inserts a word into the list of words.  If the word is
+ * not yet in the list, a new slot is used with the count set to 1.
+ * Otherwise, the count is simply incremented.
+ */
+void insert_word (word *words, int *n, char *s) {
+    int	i;
+
+    /* linear search for the word */
+    for (i=0; i<*n; i++) {
+        if (strcmp(s, words[i].s) == 0) {
+
+            /* found it?  increment and return. */
+
+            words[i].count++;
+            return;
+        }
+    }
+
+    if (strlen (s) >= MAX_SIZE) {
+        fprintf (stderr, "word too long!\n");
+        exit (1);
+    }
+    if (*n >= MAX_SIZE) {
+        fprintf (stderr, "too many words!\n");
+        exit (1);
+    }
+
+    /* copy the word into the structure at the first available slot,
+     * i.e., *n
+     */
+
+    strcpy (words[*n].s, s);
+
+    /* this word has occured once up to now, so count = 1 */
+
+    words[*n].count = 1;
+
+    /* one more word */
+
+    (*n)++;
+}
+
+/* comparison function for quicksort.  this lets quicksort sort words
+ * by descending order of count, i.e., from most to least frequent
+ */
+int wordcmp (word *a, word *b) {
+    if (a->count < b->count) return +1;
+    if (a->count > b->count) return -1;
+    return 0;
+}
+
 /* return 1 if c is alphabetic (a..z or A..Z), 0 otherwise */
 int is_alpha (char c) {
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) return 1;
@@ -232,61 +284,17 @@ void make_lowercase (char *s) {
     for (i=0; s[i]; i++) s[i] = tolower(s[i]);
 }
 
-/*
- * This function inserts a word into the list of words.  If the word is
- * not yet in the list, a new slot is used with the count set to 1.
- * Otherwise, the count is simply incremented.
- */
-void insert_word (word *words, int *n, char *s) {
-    int	i;
-
-    /* linear search for the word */
-    for (i=0; i<*n; i++) {
-        if (strcmp(s, words[i].s) == 0) {
-
-            /* found it?  increment and return. */
-
-            words[i].count++;
-            return;
-        }
-    }
-
-    /* copy the word into the structure at the first available slot,
-     * i.e., *n
-     */
-
-    strcpy (words[*n].s, s);
-
-    /* this word has occured once up to now, so count = 1 */
-
-    words[*n].count = 1;
-
-    /* one more word */
-
-    (*n)++;
-}
-
-/* comparison function for quicksort.  this lets quicksort sort words
- * by descending order of count, i.e., from most to least frequent
- */
-int wordcmp (word *a, word *b) {
-    if (a->count < b->count) return +1;
-    if (a->count > b->count) return -1;
-    return 0;
-}
 
 void export(struct File_records *data) {
-
+    printf("as");
     char ch;
     float fields_per_line[MIN_SIZE];
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
 
-
-
     FILE *file;
-    file = fopen(data->fname, "r");
+    file = fopen("text.txt", "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -311,39 +319,45 @@ void export(struct File_records *data) {
     printf("\nThe total number of field was : %d", field_counter);
     printf("\nThe average number of field per line was : %.2f\n", average);
 
+    fclose(file);
     // Five more frequent words
     word words[MAX_SIZE];
     char s[MAX_SIZE];
-    int i, n;
+    int i, n, m;
 
-    file = fopen(data->fname, "r");
+    n = 0;
+
+    file = fopen("text.txt", "a+");
 
     /* read all the words from the file... */
     while (!feof(file)) {
         fscanf(file, "%s", s);
 
         /* only insert the word if it's not punctuation */
-
         if (is_alpha(s[0])) {
 
             /* get rid of non-letters */
-
             remove_non_alpha(s);
 
             /* make all letters lowercase */
-
             make_lowercase(s);
 
             /* put this word in the list */
-
             insert_word(words, &n, s);
 
         }
     }
     /* sort the list of words by descending frequency */
-
     qsort((void *) words, n, sizeof(word),
           (int (*)(const void *, const void *)) wordcmp);
+
+    /* if fewer than 20 words in total, just print up the the
+     * first n words
+     */
+    if (n < 20)
+        m = n;
+    else
+        m = 20;
 
     /* print the words with their frequencies */
     printf("\nThe 5 most common words in the file are:\n");
@@ -352,7 +366,7 @@ void export(struct File_records *data) {
             printf("\n%s: %d\n", words[i].s, words[i].count);
         }
     }
-    fclose(file);
+
 }
 
 void export_file(struct File_records *data) {
@@ -369,7 +383,7 @@ void export_file(struct File_records *data) {
     scanf("%s",data->fname);
 
     FILE *file;
-    file = fopen(data->fname, "r");
+    file = fopen("text.txt", "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
