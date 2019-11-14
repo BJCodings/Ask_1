@@ -430,6 +430,48 @@ void export_file(struct File_records *data) {
 
     printf("\nThe file has successfully exported with the name : \"%s\"", exported_file_name);
 
+    // Five more frequent words
+    word words[SIZE];
+    char s[1000];
+    int i, n, m;
+
+    file = fopen(data->fname, "r");
+
+    /* read all the words from the file... */
+    while (!feof(file)) {
+        fscanf(file, "%s", s);
+
+        /* only insert the word if it's not punctuation */
+
+        if (is_alpha(s[0])) {
+
+            /* get rid of non-letters */
+
+            remove_non_alpha(s);
+
+            /* make all letters lowercase */
+
+            make_lowercase(s);
+
+            /* put this word in the list */
+
+            insert_word(words, &n, s);
+
+        }
+    }
+    /* sort the list of words by descending frequency */
+
+    qsort((void *) words, n, sizeof(word),
+          (int (*)(const void *, const void *)) wordcmp);
+
+    /* print the words with their frequencies */
+    fprintf(export_file,"\nThe 5 most common words in the file are:\n");
+    for (i = 0; i < 5; i++){
+        if (words[i].count != 0) {
+            fprintf(export_file,"\n%s: %d\n", words[i].s, words[i].count);
+        }
+    }
+
     fclose(file);
     fclose(export_file);
 }
