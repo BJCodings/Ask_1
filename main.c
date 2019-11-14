@@ -8,16 +8,17 @@
 #include <string.h>
 #include <ctype.h>
 
-#define SIZE 1000
+#define MAX_SIZE 10000
+#define MIN_SIZE 100
 
 /* structure holding word frequency information */
 typedef struct word {
-    char	s[SIZE];	/* the word */
+    char s[MAX_SIZE];	/* the word */
     int	count;		/* number of times word occurs */
 } word;
 
 struct File_records {
-    char fname[20];
+    char fname;
     int choice;
 };
 
@@ -46,7 +47,8 @@ void export_file(struct File_records *data);
 
 int main() {
     struct File_records *data;
-    data->choice = -1;
+  data->choice = -1;
+
 
     while (data->choice != 0) {
 
@@ -60,7 +62,7 @@ int main() {
                "\n0. Exit the program");
         printf("\n********************************************************************************************");
         printf("\nSelect an option:\t");
-        scanf("%d", &data->choice);
+        scanf("%d", data->fname);
         fflush(stdin);
 
         if (data->choice == 1) {
@@ -86,7 +88,7 @@ int main() {
 void creation(struct File_records *data) {
 
     printf("Enter a name for the file :\t");
-    gets(data->fname);
+    gets(&data->fname);
 
     FILE *file;
     file = fopen(data->fname, "a+");
@@ -95,9 +97,9 @@ void creation(struct File_records *data) {
         exit(-1);
     }
 
-    char input[SIZE];
+    char input[MIN_SIZE];
     printf("Start typing :\t");
-    fgets(input, SIZE, stdin);
+    fgets(input, MIN_SIZE, stdin);
     fputs(input, file); //Place the input into the file
 
     fclose(file);
@@ -113,9 +115,9 @@ void concatenate(struct File_records *data) {
         exit(-1);
     }
 
-    char input[SIZE];
+    char input[MIN_SIZE];
     printf("Start typing :\t");
-    fgets(input, SIZE, stdin); // Get input
+    fgets(input, MAX_SIZE, stdin); // Get input
     fputs(input, file);
 
     fclose(file);
@@ -126,7 +128,6 @@ void deletion(struct File_records *data) {
 
     FILE *original_file, *temp_file;
     char ch;
-    char str[SIZE];
     int delete_line, line = 0;
 
     //open file in read mode
@@ -156,18 +157,19 @@ void deletion(struct File_records *data) {
     }
 
     // Remember to try to change this
-    ch = 'A';  //resetting ch
-    while (!feof(original_file)) {
-        strcpy(str, original_file);
-        fgets(str, SIZE, original_file);
+    ch = 'A';
+    while((ch != EOF)){
+        ch = getc(original_file);
         //except the line to be deleted
-        if (!feof(original_file)) {
-            line++;
-            /* skip the line at given line number */
-            if (line != delete_line) {
-                fprintf(temp_file, "%s", str);
-            }
+        if(line != delete_line){
+            //copy all lines in the new file
+            putc(ch,temp_file);
         }
+
+        if( ch == '\n'){
+            line++;
+        }
+
     }
     fclose(original_file);
     fclose(temp_file);
@@ -185,7 +187,7 @@ void deletion(struct File_records *data) {
 }
 
 void search(struct File_records *data) {
-    char word[SIZE];
+    char word[MIN_SIZE];
 
     // Input word to search in file
     printf("\nEnter a word to search in file :\t");
@@ -199,45 +201,7 @@ void search(struct File_records *data) {
     }
 
     //Needs fixing
-    char str[SIZE];
-    char *pos;
-    int line = 0;
-    int col = 0;
-    char ch;
 
-    while (!feof(file)) {
-        fscanf(file,"%s",str);
-        printf("%s",str);
-        int char_index = 0;
-        int field_positions[SIZE];
-        int field_counter = 0;
-        line++;
-        pos = strstr(str, word);
-
-        if (pos != NULL) {
-            /* First index of word in str is
-            * Memory address of pos - memory
-             address of str. */
-            col = (pos - str);
-
-            //
-            for (ch = getc(file); ch != '\n'; ch = getc(file)) {
-                if (ch == ',') {
-                    field_counter++;
-                    field_positions[field_counter] = char_index;
-                }
-                char_index++;
-            }
-
-            for (int i = 0; i < field_counter; ++i) {
-                if (field_positions[i] < col && field_positions[i + 1] > col) {
-                    printf("\nWe found \"%s\" in line %d and in the %d field", word, line, i + 1);
-                    break;
-                }
-            }
-        }
-    }
-    fclose(file);
 }
 
 /* return 1 if c is alphabetic (a..z or A..Z), 0 otherwise */
@@ -261,12 +225,19 @@ void remove_non_alpha (char *s) {
 
     for (i=0; s[i]; i++) if (!is_alpha (s[i])) remove_char(s, i);
 }
+
+/* make all the letters in s lowercase */
 void make_lowercase (char *s) {
     int	i;
 
     for (i=0; s[i]; i++) s[i] = tolower(s[i]);
 }
 
+/*
+ * This function inserts a word into the list of words.  If the word is
+ * not yet in the list, a new slot is used with the count set to 1.
+ * Otherwise, the count is simply incremented.
+ */
 void insert_word (word *words, int *n, char *s) {
     int	i;
 
@@ -296,6 +267,9 @@ void insert_word (word *words, int *n, char *s) {
     (*n)++;
 }
 
+/* comparison function for quicksort.  this lets quicksort sort words
+ * by descending order of count, i.e., from most to least frequent
+ */
 int wordcmp (word *a, word *b) {
     if (a->count < b->count) return +1;
     if (a->count > b->count) return -1;
@@ -305,7 +279,7 @@ int wordcmp (word *a, word *b) {
 void export(struct File_records *data) {
 
     char ch;
-    float fields_per_line[SIZE];
+    float fields_per_line[MAX_SIZE];
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
@@ -340,7 +314,7 @@ void export(struct File_records *data) {
     printf("\nThe average number of field per line was : %.2f\n", average);
 
     // Five more frequent words
-    word words[SIZE];
+    word words[MAX_SIZE];
     char s[1000];
     int i, n, m;
 
@@ -385,8 +359,8 @@ void export(struct File_records *data) {
 
 void export_file(struct File_records *data) {
     char ch;
-    char exported_file_name[SIZE];
-    int fields_per_line[SIZE];
+    char exported_file_name[MAX_SIZE];
+    int fields_per_line[MAX_SIZE];
     int line_counter = 0;
     int field_counter = 0;
     float sum = 0;
@@ -414,7 +388,7 @@ void export_file(struct File_records *data) {
     float average;
     for (int i = 0; i < line_counter; ++i) {
         sum += fields_per_line[i];
-        average = sum / line_counter;
+        average = (float)sum / line_counter;
     }
 
     FILE *export_file;  //Creation of a new file
@@ -426,14 +400,14 @@ void export_file(struct File_records *data) {
 
     fprintf(export_file, "\nThe total number of lines was : %d", line_counter);
     fprintf(export_file, "\nThe total number of field was : %d", field_counter);
-    fprintf(export_file, "\nThe average number of field per line was : %1.2f", average);
+    fprintf(export_file, "\nThe average number of field per line was : %.2f", average);
 
     printf("\nThe file has successfully exported with the name : \"%s\"", exported_file_name);
 
     // Five more frequent words
-    word words[SIZE];
+    word words[MAX_SIZE];
     char s[1000];
-    int i, n, m;
+    int i, n;
 
     file = fopen(data->fname, "r");
 
