@@ -46,7 +46,8 @@ void export(struct File_records *data);
 void export_file(struct File_records *data);
 
 int main() {
-    struct File_records *data;
+  struct File_records *data;
+  data = (struct File_records *)malloc(sizeof(struct File_records));
   data->choice = -1;
 
 
