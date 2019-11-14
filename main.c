@@ -18,7 +18,7 @@ typedef struct word {
 } word;
 
 struct File_records {
-    char fname;
+    char fname[MIN_SIZE];
     int choice;
 };
 
@@ -98,9 +98,9 @@ void creation(struct File_records *data) {
         exit(-1);
     }
 
-    char input[MIN_SIZE];
+    char input[MAX_SIZE];
     printf("Start typing :\t");
-    fgets(input, MIN_SIZE, stdin);
+    fgets(input, MAX_SIZE, stdin);
     fputs(input, file); //Place the input into the file
 
     fclose(file);
@@ -130,6 +130,7 @@ void deletion(struct File_records *data) {
     FILE *original_file, *temp_file;
     char ch;
     int delete_line, line = 0;
+    char str[MAX_SIZE];
 
     //open file in read mode
     original_file = fopen(data->fname, "r");
@@ -138,6 +139,13 @@ void deletion(struct File_records *data) {
         exit(-1);
     }
 
+    temp_file = fopen("replica.c", "w"); // open the temporary file in write mode
+    if (!temp_file)
+    {
+        printf("Unable to open a temporary file to write!!\n");
+        fclose(temp_file);
+
+    }
     //Prints the entries of the file
     printf("**************************************************\n");
     while (ch != EOF) {
@@ -151,26 +159,16 @@ void deletion(struct File_records *data) {
     scanf("%d", &delete_line); // Get the line that going to be deleted
 
     //open new file in write mode
-    temp_file = fopen("replica.c", "w");
-    if (!temp_file) {
-        printf("\nError opening data!\n");
-        exit(-1);
-    }
-
-    // Remember to try to change this
-    ch = 'A';
-    while((ch != EOF)){
-        ch = getc(original_file);
-        //except the line to be deleted
-        if(line != delete_line){
-            //copy all lines in the new file
-            putc(ch,temp_file);
-        }
-
-        if( ch == '\n'){
+    while(!feof(original_file)){
+        strcpy(str,"\n");
+        fgets(str,MAX_SIZE,original_file);
+        if(!feof(original_file)){
             line++;
-        }
+            if (line != delete_line){
+                fprintf(temp_file,"%s",str);
+            }
 
+        }
     }
     fclose(original_file);
     fclose(temp_file);
@@ -307,8 +305,6 @@ void export(struct File_records *data) {
         sum += fields_per_line[i];  // find the average field per line;
         average = (float) sum / line_counter;
     }
-
-    fclose(file);
 
     printf("\nThe total number of lines was : %d", line_counter);
     printf("\nThe total number of field was : %d", field_counter);
