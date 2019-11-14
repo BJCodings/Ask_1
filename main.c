@@ -206,7 +206,7 @@ void search(struct File_records *data) {
 
 /* return 1 if c is alphabetic (a..z or A..Z), 0 otherwise */
 int is_alpha (char c) {
-    if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') return 1;
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) return 1;
     return 0;
 }
 
@@ -315,8 +315,8 @@ void export(struct File_records *data) {
 
     // Five more frequent words
     word words[MAX_SIZE];
-    char s[1000];
-    int i, n, m;
+    char s[MAX_SIZE];
+    int i, n;
 
     file = fopen(data->fname, "r");
 
@@ -385,6 +385,7 @@ void export_file(struct File_records *data) {
             fields_per_line[line_counter] += 1;
         }
     }
+
     float average;
     for (int i = 0; i < line_counter; ++i) {
         sum += fields_per_line[i];
