@@ -63,7 +63,7 @@ int main() {
                "\n0. Exit the program");
         printf("\n********************************************************************************************");
         printf("\nSelect an option:\t");
-        scanf("%d", data->fname);
+        scanf("%d",&data->choice);
         fflush(stdin);
 
         if (data->choice == 1) {
@@ -89,7 +89,7 @@ int main() {
 void creation(struct File_records *data) {
 
     printf("Enter a name for the file :\t");
-    gets(&data->fname);
+    gets(data->fname);
 
     FILE *file;
     file = fopen(data->fname, "a+");
