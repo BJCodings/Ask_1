@@ -155,6 +155,7 @@ void deletion(struct File_records *data) {
         exit(-1);
     }
 
+    // Remember to try to change this
     ch = 'A';  //resetting ch
     while (!feof(original_file)) {
         strcpy(str, original_file);
@@ -197,7 +198,7 @@ void search(struct File_records *data) {
         exit(-1);
     }
 
-    //Fixing
+    //Needs fixing
     char str[SIZE];
     char *pos;
     int line = 0;
@@ -338,8 +339,7 @@ void export(struct File_records *data) {
     printf("\nThe total number of field was : %d", field_counter);
     printf("\nThe average number of field per line was : %.2f\n", average);
 
-
-    //tesxt
+    // Five more frequent words
     word words[SIZE];
     char s[1000];
     int i, n, m;
