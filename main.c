@@ -187,18 +187,21 @@ void deletion(struct File_records *data) {
 }
 
 void search(struct File_records *data) {
-    char word[MIN_SIZE];
-    // Input word to search in file
-    printf("\nEnter a word to search in file :\t");
-    scanf("%s", word);
-
-    FILE *file;
-    file = fopen(data->fname, "r"); //data->fname : "text.txt"
-    if (file == NULL) {
-        printf("\nUnable to open file.\n");
-        exit(-1);
-    }
-
+//    char word[MIN_SIZE];
+//    char str[MAX_SIZE];
+//    // Input word to search in file
+//    printf("\nEnter a word to search in file :\t");
+//    scanf("%s", word);
+//
+//    FILE *file;
+//    file = fopen(data->fname, "r"); //data->fname : "text.txt"
+//    if (file == NULL) {
+//        printf("\nUnable to open file.\n");
+//        exit(-1);
+//    }
+//    while((fgets(str,MAX_SIZE,file))!=NULL{
+//
+//    })
 }
 
 /*
@@ -284,7 +287,6 @@ void make_lowercase (char *s) {
 
 
 void export(struct File_records *data) {
-    printf("as");
     char ch;
     float fields_per_line[MIN_SIZE];
     int line_counter = 0;
@@ -292,7 +294,7 @@ void export(struct File_records *data) {
     float sum = 0;
 
     FILE *file;
-    file = fopen("text.txt", "r");
+    file = fopen(data->fname, "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -326,7 +328,7 @@ void export(struct File_records *data) {
 
     n = 0;
 
-    file = fopen("text.txt", "a+");
+    file = fopen(data->fname, "a+");
 
     /* read all the words from the file... */
     while (!feof(file)) {
@@ -382,7 +384,7 @@ void export_file(struct File_records *data) {
     scanf("%s",exported_file_name);
 
     FILE *file;
-    file = fopen(data->fname, "r");
+    file = fopen(data->fname, "a+");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -457,10 +459,10 @@ void export_file(struct File_records *data) {
         m = 20;
 
     /* print the words with their frequencies */
-    printf("\nThe 5 most common words in the file are:\n");
+    fprintf(export_file,"\nThe 5 most common words in the file are:\n");
     for (i = 0; i < 5; i++){
         if (words[i].count != 0) {
-            printf("\n%s: %d\n", words[i].s, words[i].count);
+            fprintf(export_file,"\n%s: %d\n", words[i].s, words[i].count);
         }
     }
 
