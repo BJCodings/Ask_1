@@ -379,10 +379,10 @@ void export_file(struct File_records *data) {
 
     printf("\nEnter the name of the the file of which the contents of the file \"%s\" will be exported to :\t",
            data->fname);
-    scanf("%s",data->fname);
+    scanf("%s",exported_file_name);
 
     FILE *file;
-    file = fopen("text.txt", "r");
+    file = fopen(data->fname, "r");
     if (file == NULL) {
         printf("Error opening file!\n");
         exit(-1);
@@ -424,7 +424,7 @@ void export_file(struct File_records *data) {
 
     n = 0;
 
-    file = fopen("text.txt", "a+");
+    file = fopen(data->fname, "a+");
 
     /* read all the words from the file... */
     while (!feof(file)) {
