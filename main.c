@@ -419,7 +419,7 @@ void export_file(struct File_records *data) {
     char exported_file_name[MAX_SIZE];
     float fields_per_line[MAX_SIZE];
     int line_counter = 0;
-    float field_counter = 0;
+    int field_counter = 0;
     float sum = 0;
 
     printf("\nEnter the name of the the file of which the contents of the file \"%s\" will be exported to :\t",
