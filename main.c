@@ -189,19 +189,56 @@ void deletion(struct File_records *data) {
 }
 
 void search(struct File_records *data) {
-    char word[MIN_SIZE];
-    char str[MAX_SIZE];
-
-    // Input word to search in file
-    printf("\nEnter a word to search in file :\t");
-    scanf("%s", word);
-
-    FILE *file;
-    file = fopen(data->fname, "r");
-    if (file == NULL) {
-        printf("\nUnable to open file.\n");
-        exit(-1);
-    }
+//    char word[MIN_SIZE];
+//    char str[MAX_SIZE];
+//    int line = 0;
+//    int col = -1;
+//
+//    // Input word to search in file
+//    printf("\nEnter a word to search in file :\t");
+//    scanf("%s", word);
+//
+//    FILE *file;
+//    file = fopen(data->fname, "r");
+//    if (file == NULL) {
+//        printf("\nUnable to open file.\n");
+//        exit(-1);
+//    }
+//
+//    while ((fgets(str, MAX_SIZE, file) != NULL)){
+//        char ch = ' ';
+//        int field_pos[MIN_SIZE];
+//        int field_counter = 1;
+//        int field = 1;
+//        char *pos;
+//
+//        pos = strstr(str,word);
+//        printf("%s",pos);
+//
+//        if(pos!=NULL){
+//            // First index of word in str is
+//            // Memory address of pos - memory
+//            // address of str.
+//            col = (pos - str);
+//            int i = 0;
+//            while (ch != EOF){
+//                ch = getc(file);
+//                if (ispunct(ch)){
+//                    field_pos[field_counter] = i;
+//                    field_counter++;
+//                }
+//                i++;
+//            }
+//
+//            for (int j = 0; j < field_counter ; ++j) {
+//                if (field_pos[j] < col && field_pos[j+1] > col){
+//                    printf("\nThe word \"%s\" was found at the line %d and in the %d field", word,line,field);
+//                }else{
+//                    field++;
+//                }
+//            }
+//        }
+//    }
 }
 
 /*
