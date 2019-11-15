@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <ctype.h> // for tolower
 
 #define MAX_SIZE 1000
 #define MIN_SIZE 100
@@ -18,8 +18,8 @@ typedef struct word {
 } word;
 
 struct File_records {
-    char fname[MIN_SIZE];
-    int choice;
+    char fname[MIN_SIZE]; // name of the file
+    int choice; // menu choice
 };
 
 //Declaration of the procedures
@@ -47,7 +47,7 @@ void export_file(struct File_records *data);
 
 int main() {
   struct File_records *data;
-  data = (struct File_records *)malloc(sizeof(struct File_records));
+  data = (struct File_records *)malloc(sizeof(struct File_records)); // ask
   data->choice = -1;
 
 
@@ -80,6 +80,7 @@ int main() {
             export_file(data);
         } else if (data->choice == 0) {
             printf("\nTerminating program...");
+            free(data);
             exit(0);
         }
     }
@@ -93,7 +94,7 @@ void creation(struct File_records *data) {
     getc(stdin);
 
     FILE *file;
-    file = fopen(data->fname, "a+");
+    file = fopen(data->fname, "a+"); //open the file and check if all went good
     if (file == NULL) {
         printf("\n\tError opening file!\n");
         exit(-1);
@@ -101,7 +102,7 @@ void creation(struct File_records *data) {
 
     char input[MAX_SIZE];
     printf("Start typing :\t");
-    fgets(input, MAX_SIZE, stdin);
+    fgets(input, MAX_SIZE, stdin);  //get the input from the user and place it in the file
     fputs(input, file); //Place the input into the file
 
     fclose(file);
@@ -140,14 +141,14 @@ void deletion(struct File_records *data) {
         exit(-1);
     }
 
-    temp_file = fopen("replica.c", "w"); // open the temporary file in write mode
+    temp_file = fopen("replica.c", "w");
     if (!temp_file)
     {
         printf("Unable to open a temporary file to write!!\n");
         fclose(temp_file);
 
     }
-    //Prints the entries of the file
+    //Prints the entries of the file in order to choose what we want to delete
     printf("**************************************************\n");
     while (ch != EOF) {
         ch = getc(original_file);
@@ -159,7 +160,7 @@ void deletion(struct File_records *data) {
     printf("Enter the line number of the line to be deleted:\t");
     scanf("%d", &delete_line); // Get the line that going to be deleted
 
-    //open new file in write mode
+    // pass all entries to the replica file except from the line that is going to be deleted
     while(!feof(original_file)){
         strcpy(str,"\n");
         fgets(str,MAX_SIZE,original_file);
@@ -176,6 +177,7 @@ void deletion(struct File_records *data) {
     remove(data->fname); //delete the original file
     rename("replica.c", data->fname); //rename the file replica.c to original file name
 
+    //Print the contents for the file
     printf("\nThe contents of file after being modified are as follows:\n\t");
     original_file = fopen(data->fname, "r");
     ch = getc(original_file);
@@ -189,17 +191,17 @@ void deletion(struct File_records *data) {
 void search(struct File_records *data) {
     char word[MIN_SIZE];
     char str[MAX_SIZE];
+
     // Input word to search in file
     printf("\nEnter a word to search in file :\t");
     scanf("%s", word);
 
     FILE *file;
-    file = fopen(data->fname, "r"); //data->fname : "text.txt"
+    file = fopen(data->fname, "r");
     if (file == NULL) {
         printf("\nUnable to open file.\n");
         exit(-1);
     }
-
 }
 
 /*
@@ -319,7 +321,7 @@ void export(struct File_records *data) {
 
     fclose(file);
 
-    // Five more frequent words
+    // Code for the occurrence of the 5 most frequent words
     word words[MAX_SIZE];
     char s[MAX_SIZE];
     int i, n, m;
@@ -372,9 +374,9 @@ void export_file(struct File_records *data) {
 
     char ch;
     char exported_file_name[MAX_SIZE];
-    int fields_per_line[MAX_SIZE];
+    float fields_per_line[MAX_SIZE];
     int line_counter = 0;
-    int field_counter = 0;
+    float field_counter = 0;
     float sum = 0;
 
     printf("\nEnter the name of the the file of which the contents of the file \"%s\" will be exported to :\t",
@@ -460,7 +462,7 @@ void export_file(struct File_records *data) {
     fprintf(export_file,"\nThe 5 most common words in the file are:\n");
     for (i = 0; i < 5; i++){
         if (words[i].count != 0) {
-            fprintf(export_file,"\n%s: %d\n", words[i].s, words[i].count);
+            fprintf(export_file,"\n%s: %d\n", words[i].s, words[i].count-1);
         }
     }
 
